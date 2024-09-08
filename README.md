@@ -1,8 +1,4 @@
-<!-- render {"template":"# Kibana <%= pkg.version %>"} -->
-# Kibana 4.0.0-BETA1.1
-<!-- /render -->
-
-[![Build Status](https://magnum.travis-ci.com/elasticsearch/kibana4.svg?token=tsFxSKHtVKG8EZavSjXY&branch=master)](https://magnum.travis-ci.com/elasticsearch/kibana4)
+# Kibana
 
 Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch. Kibana is a snap to setup and start using. Kibana strives to be easy to get started with, while also being flexible and powerful, just like Elasticsearch.
 
@@ -24,7 +20,6 @@ Kibana is an open source (Apache Licensed), browser based analytics and search d
 
 ## Installation
 
-* Download: [http://www.elasticsearch.org/overview/kibana/installation/](http://www.elasticsearch.org/overview/kibana/installation/)
 * Run `bin/kibana` on unix, or `bin/kibana.bat` on Windows.
 * Visit [http://localhost:5601](http://localhost:5601)
 
@@ -173,7 +168,7 @@ To the right of the search box there are a row of icons for creating new visuali
 
 #### Aggregation Builder
 
-The aggregation builder on the left of the screen is used for configuring the [metric](http://www.elasticsearch.org/guide/en/elasticsearch/reference/1.x/search-aggregations.html#_metrics_aggregations) and [bucket](http://www.elasticsearch.org/guide/en/elasticsearch/reference/1.x/search-aggregations.html#_bucket_aggregations) aggregations used to create a visualization. (If you are coming from the SQL world, buckets are similar to group-bys. Check out the [Elasticsearch docs](http://www.elasticsearch.org/guide/en/elasticsearch/reference/1.x/search-aggregations.html) for more info) For a bar chart or line chart, the *metric* is used for the y-axis and the *buckets* are used for the x-axis, segment bar colors, and row/column splits. For pie charts the "metric" is used for the size of the slice and the *bucket* is used for the number of slices. Other visualizations may use these in new and different ways.
+The aggregation builder on the left of the screen is used for configuring the metric and bucket aggregations used to create a visualization. (If you are coming from the SQL world, buckets are similar to group-bys. Check out the Elasticsearch docs for more info For a bar chart or line chart, the *metric* is used for the y-axis and the *buckets* are used for the x-axis, segment bar colors, and row/column splits. For pie charts the "metric" is used for the size of the slice and the *bucket* is used for the number of slices. Other visualizations may use these in new and different ways.
 
 For the remainder of this documentation we are going to use the bar chart as our example when discussing the features of the aggregation panel. The same concepts apply to the other visualizations but the bar chart is the workhorse of the visualization world.
 
