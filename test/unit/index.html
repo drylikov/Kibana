@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kibana4 Tests</title>
+
+    <link rel="stylesheet" href="/node_modules/mocha/mocha.css" />
+    <script src="/node_modules/expect.js/index.js"></script>
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/src/kibana/bower_components/requirejs/require.js"></script>
+    <script src="/src/kibana/require.config.js"></script>
+
+    <script>(function () {
+      var COVERAGE = !!(/coverage/i.test(window.location.search));
+      var SAUCELABS = !!(/saucelabs/i.test(window.location.search));
+
+      mocha.setup({
+        ui: 'bdd',
+        reporter: 'html'
+      });
+
+      require.config({
+        baseUrl: '/src/kibana',
+        paths: {
+          config: '/config',
+          test_utils: '../../test/utils',
+          fixtures: '../../test/unit/fixtures',
+          vislib_fixtures: '../../test/unit/specs/vislib/fixture',
+          specs: '../../test/unit/specs',
+          sinon: '../../test/utils/sinon',
+          bluebird: 'bower_components/bluebird/js/browser/bluebird',
+          angular: 'bower_components/angular-mocks/angular-mocks',
+          angular_src: 'bower_components/angular/angular',
+          screencast_reporter_css: '../../node_modules/mocha-screencast-reporter/screencast-reporter',
+          ScreencastReporter: '../../node_modules/mocha-screencast-reporter/screencast-reporter'
+        },
+        shim: {
+          angular: {
+            deps: [
+              'jquery',
+              'angular_src'
+            ],
+            exports: 'angular'
+          },
+          'sinon/sinon': {
+            deps: [
+              'sinon/sinon-timers-1.8.2'
+            ],
+            exports: 'sinon'
+          }
+        },
+        waitSeconds: 6000,
+        // mark all requested files with instrument query param
+        urlArgs: COVERAGE ? 'instrument=true' : void 0
+      });
+
+      function setupCoverage(done) {
+        document.title = document.title.replace('Tests', 'Coverage');
+        require([
+          'test_utils/istanbul_reporter/reporter'
+        ], function (IstanbulReporter) {
+          mocha.reporter(IstanbulReporter);
+          done();
+        });
+      }
+
+      function setupSaucelabsReporter(done) {
+        require([
+          'ScreencastReporter',
+          'css!screencast_reporter_css'
+        ], function (ScreencastReporter) {
+          mocha.reporter(ScreencastReporter);
+          done()
+        });
+      }
+
+      function runTests() {
+        require([
+          'kibana',
+          'sinon/sinon',
+          'specs/apps/discover/hit_sort_fn',
+          'specs/apps/discover/directives/table',
+          'specs/apps/discover/directives/discover_field',
+          'specs/apps/discover/directives/field_chooser',
+          'specs/apps/discover/directives/field_calculator',
+          'specs/apps/discover/segmented_fetch',
+          'specs/directives/confirm-click',
+          'specs/directives/timepicker',
+          'specs/directives/truncate',
+          'specs/directives/typeahead',
+          'specs/directives/css_truncate',
+          'specs/directives/spinner',
+          'specs/filters/field_type',
+          'specs/filters/uriescape',
+          'specs/filters/moment',
+          'specs/filters/rison',
+          'specs/filters/short_dots',
+          'specs/filters/start_from',
+          'specs/services/storage',
+          'specs/services/persisted_log',
+          'specs/services/url',
+          'specs/utils/datemath',
+          'specs/utils/interval',
+          'specs/utils/versionmath',
+          'specs/utils/routes/index',
+          'specs/utils/sequencer',
+          'specs/utils/html_escape',
+          'specs/courier/search_source/_get_normalized_sort',
+          'specs/factories/base_object',
+          'specs/state_management/state',
+          'specs/state_management/global_state',
+          'specs/state_management/app_state',
+          'specs/utils/diff_object',
+          'specs/factories/events',
+          'specs/vislib/color',
+          'specs/vislib/zero_injection',
+          'specs/vislib/labels',
+          'specs/vislib/x_axis',
+          'specs/vislib/y_axis',
+          'specs/vislib/axis_title',
+          'specs/vislib/chart_title',
+          'specs/vislib/layout_types',
+          'specs/vislib/vis_types',
+          'specs/vislib/splits',
+          'specs/vislib/layout',
+          'specs/vislib/_chart',
+          'specs/vislib/column_layout',
+          'specs/vislib/index',
+          'specs/vislib/vis',
+          'specs/vislib/tooltip',
+          'specs/vislib/handler',
+          'specs/vislib/_error_handler',
+          'specs/vislib/data',
+          'specs/vislib/resize_checker',
+          'specs/utils/diff_time_picker_vals',
+          'specs/factories/events',
+          'specs/index_patterns/_flatten_search_response',
+          'specs/utils/registry/index',
+          'specs/directives/filter_bar',
+          'specs/components/agg_types/index',
+          'specs/components/vis/index',
+          'specs/components/reflow_watcher'
+        ], function (kibana, sinon) {
+          kibana.load(function () {
+            var xhr = sinon.useFakeXMLHttpRequest();
+
+            window.mochaRunner = mocha.run().on('end', function () {
+              window.mochaResults = this.stats;
+              window.mochaResults.details = getFailedTests(this);
+              xhr.restore();
+            });
+
+            function getFailedTests(runner) {
+              var fails = [];
+              var suiteStack = [];
+
+              (function recurse(suite) {
+                suiteStack.push(suite);
+
+                (suite.tests || [])
+                .filter(function (test) {
+                  return test.state !== 'passed' && test.state !== 'pending';
+                })
+                .forEach(function (test) {
+                  fails.push({
+                    title: suiteStack.concat(test).reduce(function (title, suite) {
+                      if (suite.title) {
+                        return (title ? title + ' ' : '') + suite.title;
+                      } else {
+                        return title;
+                      }
+                    }, ''),
+                    err: test.err ? (test.err.stack || test.err.message) : 'unknown error'
+                  });
+                });
+
+                (suite.suites || []).forEach(recurse);
+
+                suiteStack.pop();
+              }(runner.suite));
+
+              return fails;
+            }
+
+          });
+        });
+      }
+
+      if (COVERAGE) {
+        setupCoverage(runTests);
+      }
+      else if (SAUCELABS) {
+        setupSaucelabsReporter(runTests);
+      }
+      else {
+        runTests();
+      }
+
+    })();</script>
+  </head>
+  <body><div id="mocha"></div></body>
+</html>

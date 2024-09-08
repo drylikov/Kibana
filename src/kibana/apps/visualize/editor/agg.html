@@ -1,0 +1,83 @@
+<ng-form name="aggForm" class="vis-editor-agg">
+
+  <!-- header -->
+  <div class="vis-editor-agg-header">
+
+    <!-- open/close editor -->
+    <button
+      ng-click="editorOpen = !editorOpen"
+      type="button"
+      class="btn btn-xs vis-editor-agg-header-toggle">
+      <i ng-class="{ 'fa-caret-down': editorOpen, 'fa-caret-right': !editorOpen }" class="fa"></i>
+    </button>
+
+    <!-- title -->
+    <span class="vis-editor-agg-header-title">
+      {{ agg.schema.title }}
+    </span>
+
+    <!-- description -->
+    <span ng-if="!editorOpen && aggForm.$valid" class="vis-editor-agg-header-description">
+      {{ describe() }}
+    </span>
+
+    <!-- error -->
+    <span ng-if="!editorOpen && aggForm.$invalid" class="vis-editor-agg-header-description danger">
+      {{ describeError() }}
+    </span>
+
+    <!-- controls !!!actually disabling buttons will break tooltips¡¡¡ -->
+    <div class="vis-editor-agg-header-controls btn-group">
+      <!-- up button -->
+      <button
+        ng-if="group.length > 1"
+        ng-class="{ disabled: $first }"
+        ng-click="moveUp(agg)"
+        tooltip="Increase Priority"
+        tooltip-append-to-body="true"
+        type="button"
+        class="btn btn-xs btn-default">
+        <i class="fa fa-caret-up"></i>
+      </button>
+
+      <!-- down button -->
+      <button
+        ng-if="group.length > 1"
+        ng-class="{ disabled: $last }"
+        ng-click="moveDown(agg)"
+        tooltip="Decrease Priority"
+        tooltip-append-to-body="true"
+        type="button"
+        class="btn btn-xs btn-default">
+        <i class="fa fa-caret-down"></i>
+      </button>
+
+      <!-- remove button -->
+      <button
+        ng-if="group.length > groupMin"
+        ng-click="remove(agg)"
+        tooltip="Remove Dimension"
+        tooltip-append-to-body="true"
+        type="button"
+        class="btn btn-xs btn-danger">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="vis-editor-agg-editor" ng-show="editorOpen">
+    <div ng-if="aggIsTooLow" class="form-group">
+      <p class="vis-editor-agg-error">
+        "{{ agg.schema.title }}" aggs must run before all other buckets!
+      </p>
+      <input
+        type="number"
+        name="order"
+        ng-model="$index"
+        max="{{aggIsTooLow ? $index - 1 : $index}}"
+        style="display: none;">
+    </div>
+
+    <!-- schema editors get added down here: aggSelect.html, agg_types/controls/*.html -->
+  </div>
+</ng-form>
